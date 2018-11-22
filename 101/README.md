@@ -124,8 +124,6 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
-
-
 livenessProbe
 アプリの死活監視
 エラーの場合、k8sがPodを再起動してくれる
@@ -139,22 +137,35 @@ initialDelaySeconds
 timeoutSeconds
 periodSeconds
 failureThreshold
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#define-readiness-probes
 
-課題
 
-dotnet run --urls=http://localhost:5000
-dotnet run --urls=http://localhost:5000 --pathBase=/foo
+Resource Request
+アプリを動かすために最低限必要なリソース
+ノードのリソースが足りない場合、アプリをエラーにせず、Pendingにするために設定する
+Pendingだと、ノードが追加されるなど空きリソースができ次第、再デプロイされる（スケジューリング）
+Resurce Limits
+アプリが利用できるリソースの上限値
+CPUが超えると遅くなる、メモリが超えるとPODが再起動される
+cpu 200m は200 millicoresの略で1000milli coreで1cpu。200 mill coreで 1/5 CPU使うということ
+
+```shell-session
+$ kubectl describe node
+```
+https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+
 
 環境構築
 　k8s構造レクチャ
 　AKS、ACR、inglressでRP、複数サービス
 　事前検証項目
-　　環境変数切り替え、APP Gateway、接続文字列をSecret
+　　k8sのみのバージョン切り替え、APP Gateway、接続文字列をSecret
 　　Label selecter
 サービス展開
 　Helm、AzureDevOps、Istio
 　事前検証項目
-　　Deployment.yamlの設定調査、Istioカナリアデプロイ
+　　Istioカナリアデプロイ
+    HorizontalPodAutoscaler、ノードのオートスケール
 運用監視
 　Azure Monitor、EFK、ProGra
 　事前検証項目

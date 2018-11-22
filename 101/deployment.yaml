@@ -3,17 +3,40 @@ kind: Deployment
 metadata:
   name: demo-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: demo-service
+      app: demo-app
   template:
     metadata:
       labels:
-        app: demo-service
+        app: demo-app
     spec:
       containers:
-      - name: demo-service
-        image: thara0402/k8sdemo:0.9.0
+      - name: k8sdemo
+        image: thara0402/k8sdemo:0.11.0
         ports:
           - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 1
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "100m"
+          limits:
+            memory: "200Mi"
+            cpu: "200m"
