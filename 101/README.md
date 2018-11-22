@@ -124,8 +124,6 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
-
-
 livenessProbe
 アプリの死活監視
 エラーの場合、k8sがPodを再起動してくれる
@@ -139,22 +137,124 @@ initialDelaySeconds
 timeoutSeconds
 periodSeconds
 failureThreshold
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#define-readiness-probes
+
+
+Resource Request
+アプリを動かすために最低限必要なリソース
+ノードのリソースが足りない場合、アプリをエラーにせず、Pendingにするために設定する
+Pendingだと、ノードが追加されるなど空きリソースができ次第、再デプロイされる（スケジューリング）
+Resurce Limits
+アプリが利用できるリソースの上限値
+CPUが超えると遅くなる、メモリが超えるとPODが再起動される
+cpu 200m は200 millicoresの略で1000milli coreで1cpu。200 mill coreで 1/5 CPU使うということ
+
+```shell-session
+$ kubectl describe node
+```
+https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+
+
+Istio
+```shell-session
+$ kubectl apply -f install/kubernetes/istio-demo.yaml
+$ kubectl get svc -n istio-system
+$ kubectl get pod -n istio-system
+```
+
+for windows
+```shell-session
+$ istioctl kube-inject -f samples/bookinfo/platform/kube/bookinfo.yaml > bookinfo_inject.yaml
+$ kubectl apply -f bookinfo_inject.yaml
+```
+
+for MAC
+```shell-session
+$ kubectl create -f <(istioctl kube-inject -f samples/bookinfo/platform/kube/bookinfo.yaml)
+```
+
+```shell-session
+$ kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
+$ kubectl get gateway
+$ kubectl get virtualservice
+$ kubectl get svc istio-ingressgateway -n istio-system
+$ kubectl apply -f samples/bookinfo/networking/destination-rule-all.yaml
+$ kubectl get destinationrules -o yaml
+```
+
+```shell-session
+$ kubectl apply -f samples/bookinfo/networking/virtual-service-all-v1.yaml
+$ kubectl describe virtualservices reviews
+$ kubectl apply -f samples/bookinfo/networking/virtual-service-reviews-50-v3.yaml
+$ kubectl describe virtualservices reviews
+$ kubectl apply -f samples/bookinfo/networking/virtual-service-reviews-v3.yaml
+```
+
+jaeger
+```shell-session
+$ kubectl get pod -n istio-system -l app=jaeger -o jsonpath='{.items[0].metadata.name}'
+$ kubectl port-forward -n istio-system istio-tracing-7596597bd7-8hn9w 16686:16686
+```
+http://localhost:16686
+
+Grafana
+```shell-session
+$ kubectl -n istio-system get svc prometheus
+$ kubectl -n istio-system get svc grafana
+$ kubectl -n istio-system get pod -l app=grafana -o jsonpath='{.items[0].metadata.name}'
+$ kubectl port-forward -n istio-system grafana-59b787b9b-c5fbr 3000:3000
+```
+http://localhost:3000
+
+ServiceGraph
+```shell-session
+$ kubectl -n istio-system get svc servicegraph
+$ kubectl -n istio-system get pod -l app=servicegraph -o jsonpath='{.items[0].metadata.name}'
+$ kubectl port-forward -n istio-system servicegraph-758f96bf5b-x2ggt 8088:8088
+```
+http://localhost:8088/force/forcegraph.html
+
+
+
+Istio for ASP.NET Core
+```shell-session
+$ kubectl get deploy demo-deployment -o yaml > demo_current.yaml
+$ istioctl kube-inject -f demo_current.yaml > demo_inject.yaml
+$ kubectl apply -f demo_inject.yaml
+
+$ kubectl get deploy demo-deployment-v2 -o yaml > demo_current2.yaml
+$ istioctl kube-inject -f demo_current2.yaml > demo_inject2.yaml
+$ kubectl apply -f demo_inject2.yaml
+
+$ kubectl apply -f service.yaml
+
+$ kubectl apply -f gateway.yaml
+$ kubectl get gateway
+$ kubectl apply -f virtualservice.yaml
+$ kubectl get virtualservice
+
+$ kubectl apply -f destination.yaml
+$ kubectl apply -f virtual-service-v1.yaml
+$ kubectl apply -f virtual-service-50-v2.yaml
+$ kubectl apply -f virtual-service-v2.yaml
+```
+
+
 
 課題
-
-dotnet run --urls=http://localhost:5000
-dotnet run --urls=http://localhost:5000 --pathBase=/foo
+・IstioのVSでパスを指定すると404
 
 環境構築
 　k8s構造レクチャ
 　AKS、ACR、inglressでRP、複数サービス
 　事前検証項目
-　　環境変数切り替え、APP Gateway、接続文字列をSecret
+　　k8sのみのバージョン切り替え、APP Gateway、接続文字列をSecret
 　　Label selecter
 サービス展開
 　Helm、AzureDevOps、Istio
 　事前検証項目
-　　Deployment.yamlの設定調査、Istioカナリアデプロイ
+　　Istioカナリアデプロイ
+    HorizontalPodAutoscaler、ノードのオートスケール
 運用監視
 　Azure Monitor、EFK、ProGra
 　事前検証項目
