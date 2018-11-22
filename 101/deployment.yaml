@@ -11,10 +11,11 @@ spec:
     metadata:
       labels:
         app: demo-app
+        version: v1
     spec:
       containers:
       - name: k8sdemo
-        image: thara0402/k8sdemo:0.11.0
+        image: thara0402/k8sdemo:0.10.0
         ports:
           - containerPort: 80
         livenessProbe:
