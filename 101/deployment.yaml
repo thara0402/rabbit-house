@@ -2,16 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: demo-deployment
+  labels:
+    app: demo-app
+    version: v10
 spec:
   replicas: 2
   selector:
     matchLabels:
       app: demo-app
+      version: v10
   template:
     metadata:
       labels:
         app: demo-app
-        version: v1
+        version: v10
     spec:
       containers:
       - name: k8sdemo
