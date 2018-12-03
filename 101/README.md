@@ -121,7 +121,6 @@ $ helm fetch --untar stable/nginx-ingress
 $ helm install -n rp stable/nginx-ingress --set rbac.create=false
 ```
 
-
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
@@ -244,10 +243,13 @@ $ kubectl apply -f virtual-service-50-v2.yaml
 $ kubectl apply -f virtual-service-v2.yaml
 ```
 
- "pod-template-hash": "3197534330"
-"pod-template-hash": "4282103169",
-
 課題
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+
 ・IstioのVSでパスを指定すると404
 ・Istioを使うときのnginx-ingeressの関係は
 
@@ -263,6 +265,6 @@ $ kubectl apply -f virtual-service-v2.yaml
 運用監視
 　Azure Monitor、EFK、ProGra
 　事前検証項目
-　　Azure Monitorの使い方、EFKデプロイ、ProGraデプロイ、Proアラート
+　　PVとPVCの解説、Azure Monitorの使い方、EFKデプロイ、ProGraデプロイ、Proアラート
 　　limit、オートスケール、分散トレーシング（応答時間監視）
 

@@ -1,5 +1,20 @@
 # Prometheus
 
+## DownLoad Helm charts
+
+```shell
+$ helm fetch --untar stable/prometheus
+```
+
+## Configuration
+
+Edit values.yaml
+
+Parameter | Description | Default
+--------- | ----------- | -------
+`alertmanager.persistentVolume.storageClass` | alertmanager data Persistent Volume Storage Class | `default`
+`server.persistentVolume.storageClass` | Prometheus server data Persistent Volume Storage Class | `default`
+
 ## Add kubernetes-nodes-cadvisor to values.yaml
 
 Using Grafana Dashboards.  
@@ -39,7 +54,14 @@ Using Grafana Dashboards.
             replacement: '${1}'
 ```
 
-helm fetch
+## Install
+
 ```shell
-$ helm fetch --untar stable/prometheus
+$ helm install --name monitoring-prom stable/prometheus -f values.yaml
+```
+
+## Run
+
+```shell
+$ kubectl --namespace default port-forward monitoring-prom-prometheus-server-7f657c9888-njdrf 9090
 ```

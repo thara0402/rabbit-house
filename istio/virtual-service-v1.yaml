@@ -11,4 +11,4 @@ spec:
   - route:
     - destination:
         host: demo-service
-        subset: v1
+        subset: v10
