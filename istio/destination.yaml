@@ -5,9 +5,9 @@ metadata:
 spec:
   host: demo-service
   subsets:
-  - name: v1
+  - name: v10
     labels:
-      version: v1
-  - name: v2
+      version: v10
+  - name: v11
     labels:
-      version: v2
+      version: v11
