@@ -103,6 +103,11 @@ $ docker push thara0402/k8sdemo:0.7.0
 ```shell-session
 $ kubectl apply -f deployment.yaml
 $ kubectl apply -f service.yaml
+$ kubectl apply -f deployment2.yaml
+$ kubectl apply -f service.yaml
+$ kubectl get deploy -l app=demo-app
+$ kubectl get deploy -l app=demo-app,version=v10
+$ kubectl delete -f deployment.yaml
 ```
 
 ```shell-session
@@ -239,14 +244,14 @@ $ kubectl apply -f virtual-service-50-v2.yaml
 $ kubectl apply -f virtual-service-v2.yaml
 ```
 
-
+ "pod-template-hash": "3197534330"
+"pod-template-hash": "4282103169",
 
 課題
 ・IstioのVSでパスを指定すると404
+・Istioを使うときのnginx-ingeressの関係は
 
 環境構築
-　k8s構造レクチャ
-　AKS、ACR、inglressでRP、複数サービス
 　事前検証項目
 　　k8sのみのバージョン切り替え、APP Gateway、接続文字列をSecret
 　　Label selecter
