@@ -1,0 +1,8 @@
+apiVersion: v1
+description: A Helm chart for Kibana
+name: logging-kibana
+version: v2.11.0
+maintainers:
+  - name: VIEN THE PHAM
+    email: phamthevien@archway.co.jp
+appVersion: 6.4.2

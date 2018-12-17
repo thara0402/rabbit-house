@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: logging-elasticsearch
+  labels:
+    component: logging-elasticsearch
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: logging-elasticsearch
+    spec:
+      containers:
+      - name: logging-elasticsearch
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+        image: "{{ .Values.image.repository }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: KUBERNETES_CA_CERTIFICATE_FILE
+          value: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: "DISCOVERY_SERVICE"
+          value: "elasticsearch"
+        - name: HTTP_ENABLE
+          value: "true"
+        - name: discovery.type
+          value: "single-node"
+        ports:
+        - containerPort: 9200
+          name: http
+          protocol: TCP
+        - containerPort: 9300
+          name: transport
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: logging-elasticsearch-data
