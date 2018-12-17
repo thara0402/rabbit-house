@@ -1,0 +1,10 @@
+replicaCount: 1
+image:
+  repository: docker.elastic.co/kibana/kibana:6.4.2
+  pullPolicy: Always
+service:
+  externalPort: 5601
+  internalPort: 5601
+deployment:
+  esurl: http://10.0.178.93:9200
+#  basepath: /kibana

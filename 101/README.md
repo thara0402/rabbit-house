@@ -95,9 +95,9 @@ $ kubectl get deploy demo-nginx -o yaml
 ```
 
 ```shell-session
-$ docker build -t thara0402/k8sdemo:0.7.0 ./
-$ docker run --rm -it -p 8000:80 --name k8sdemo thara0402/k8sdemo:0.7.0
-$ docker push thara0402/k8sdemo:0.7.0
+$ docker build -t thara0402/k8sdemo:0.12.0 ./
+$ docker run --rm -it -p 8000:80 --name k8sdemo thara0402/k8sdemo:0.12.0
+$ docker push thara0402/k8sdemo:0.12.0
 ```
 
 ```shell-session
@@ -237,11 +237,52 @@ $ kubectl get gateway
 $ kubectl apply -f virtualservice.yaml
 $ kubectl get virtualservice
 
+$ kubectl get destinationrule
 $ kubectl apply -f destination.yaml
 $ kubectl apply -f virtual-service-v1.yaml
 $ kubectl apply -f virtual-service-50-v2.yaml
 $ kubectl apply -f virtual-service-v2.yaml
 ```
+
+DestinationRule（subsetとversionの関連付け）
+
+svc（istio-ingressgateway）
+↓
+gateway（外部IPでアクセスできるように）
+↓
+virtualservice(svcとsubset,versionを指定)  
+
+Prometheus
+https://prometheus.io/
+
+Grafana
+https://grafana.com/
+
+Azure Monitor for Containers
+https://docs.microsoft.com/ja-jp/azure/azure-monitor/insights/container-insights-analyze?toc=%2Fazure%2Fmonitoring%2Ftoc.json#view-performance-directly-from-an-aks-cluster
+
+https://docs.microsoft.com/ja-jp/azure/azure-monitor/platform/metrics-supported#microsoftcontainerservicemanagedclusters
+
+
+Horizontal Pod Autoscaler Walkthrough
+https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+Metrics Server
+
+kubectl top pod
+kubectl get hpa
+kubectl describe hpa
+
+
+kubectl run hpatest --image=busybox
+kubectl autoscale deployment hpatest --cpu-percent=50 --min=1 --max=3
+kubectl exec -i --tty load-generator --image = busybox /bin/sh
+$ kubectl run -i --tty load-generator --image = busybox /bin/sh
+$ while true; do wget -q -O- http://php-apache.default.svc.cluster.local; done
+
+ノードのオートスケーリング
+https://docs.microsoft.com/ja-jp/azure/aks/autoscaler
+
+
 
 課題
   strategy:
@@ -253,18 +294,8 @@ $ kubectl apply -f virtual-service-v2.yaml
 ・IstioのVSでパスを指定すると404
 ・Istioを使うときのnginx-ingeressの関係は
 
-環境構築
-　事前検証項目
-　　k8sのみのバージョン切り替え、APP Gateway、接続文字列をSecret
-　　Label selecter
-サービス展開
-　Helm、AzureDevOps、Istio
-　事前検証項目
-　　Istioカナリアデプロイ
-    HorizontalPodAutoscaler、ノードのオートスケール
-運用監視
-　Azure Monitor、EFK、ProGra
-　事前検証項目
-　　PVとPVCの解説、Azure Monitorの使い方、EFKデプロイ、ProGraデプロイ、Proアラート
-　　limit、オートスケール、分散トレーシング（応答時間監視）
-
+Total number of available cpu cores in a managed cluster
+Total amount of available memory in a managed cluster
+Number of pods in Ready state
+Statuses for various node conditions
+Number of pods by phase

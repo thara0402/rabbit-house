@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: logging-kibana
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: logging-kibana
+    spec:
+      containers:
+      - name: logging-kibana
+        image: "{{ .Values.image.repository }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+          - name: ELASTICSEARCH_URL
+            value: {{ .Values.deployment.esurl }}
+          {{ if .Values.deployment.basepath }}
+          - name: SERVER_BASEPATH
+            value: "{{ .Values.deployment.basepath }}"
+          - name: SERVER_REWRITEBASEPATH
+            value: "true"
+          {{ end }}
+          - name: KIBANA_INDEX
+            value: ""
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}

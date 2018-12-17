@@ -1,0 +1,8 @@
+apiVersion: v1
+description: A Helm chart for Fluentd
+name: logging-fluentd
+version: v2.11.0
+maintainers:
+  - name: VIEN THE PHAM
+    email: phamthevien@archway.co.jp
+appVersion: v1.2-debian-elasticsearch

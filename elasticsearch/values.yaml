@@ -1,0 +1,13 @@
+replicaCount: 1
+image:
+  repository: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+  pullPolicy: Always
+persistence:
+  accessMode: ReadWriteMany
+  storageClass: azurefile
+  sizepv: 10Gi
+  sizepvc: 5Gi
+azureFile:
+    secretName: azure-secret
+    shareName: el-data
+    readOnly: false
