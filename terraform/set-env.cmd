@@ -1,0 +1,6 @@
+
+ 
+setx ARM_SUBSCRIPTION_ID xxx
+setx ARM_CLIENT_ID xxx
+setx ARM_CLIENT_SECRET xxx
+setx ARM_TENANT_ID xxx

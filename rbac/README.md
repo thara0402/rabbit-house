@@ -42,15 +42,8 @@ $ kubectl create rolebinding test01-view --clusterrole=view --serviceaccount=def
 $ create-kubeconfig test01 > config-test01
 ```
 
-
-
-
+権限確認
 ```shell-session
-$ terraform init
-$ terraform plan
-$ terraform apply
-
-
-$ terraform destroy
+$ grep client-certificate-data clouddrive/config-rabc | awk '{print $2}' | base64 -d | openssl x509 -text
+Subject: O=system:masters, CN=masterclient
 ```
-
