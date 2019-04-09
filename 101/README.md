@@ -94,6 +94,11 @@ $ kubectl scale deployment demo-nginx --replicas=3
 $ kubectl get deploy demo-nginx -o yaml
 ```
 
+MACの場合、証明書を信頼させる必要あり
+```shell-session
+dotnet dev-certs https --trust
+```
+
 ```shell-session
 $ docker build -t thara0402/k8sdemo:0.12.0 ./
 $ docker run --rm -it -p 8000:80 --name k8sdemo thara0402/k8sdemo:0.12.0
