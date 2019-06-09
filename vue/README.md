@@ -35,7 +35,7 @@ $ npm install -g @vue/cli-init
 
 ### Hello World
 ```shell-session
-$ vue init nuxt-community/starter-template my-
+$ vue init nuxt-community/starter-template my-nuxt
 $ cd my-nuxt
 $ npm install
 $ npm run dev
