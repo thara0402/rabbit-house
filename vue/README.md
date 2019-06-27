@@ -12,6 +12,32 @@ $ npm install -g @vue/cli
 ```shell-session
 $ vue create my-project
 $ cd my-project
+
+? Please pick a preset:
+  default (babel, eslint)
+❯ Manually select features
+
+? Check the features needed for your project:
+◯ Babel
+❯◉ TypeScript
+◯ Progressive Web App (PWA) Support
+◉ Router
+◯ Vuex
+◯ CSS Pre-processors
+◯ Linter / Formatter
+◯ Unit Testing
+◯ E2E Testing
+
+Use class-style component syntax? No
+
+? Use Babel alongside TypeScript for auto-detected polyfills? No
+? Use history mode for router? (Requires proper server setup for index fallback in production) Yes
+? Where do you prefer placing config for Babel, PostCSS, ESLint, etc.? In dedicated config files
+? Save this as a preset for future projects? No
+? Pick the package manager to use when installing dependencies:
+ Use Yarn
+❯ Use NPM
+
 $ npm run serve
 ```
 
