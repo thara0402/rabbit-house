@@ -25,6 +25,15 @@ $ npm run build
 $ vue add buefy
 ```
 
+### Add Element
+```shell-session
+$ vue add element
+```
+
+### Add axios
+```shell-session
+$ vue add axios
+```
 
 ## Nuxt.js
 
