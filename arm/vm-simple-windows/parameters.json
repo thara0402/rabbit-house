@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkName": {
+            "value": "gooner0808-vnet"
+        },
+        "location": {
+            "value": "japaneast"
+        },
+        "resourceGroup": {
+            "value": "gooner0808"
+        },
+        "addressPrefix": {
+            "value": "192.167.0.0/16"
+        },
+        "subnetName": {
+            "value": "default"
+        },
+        "subnetAddressPrefix": {
+            "value": "192.167.0.0/24"
+        },
+        "networkSecurityGroupName": {
+            "value": "default-nsg"
+        },
+        "networkInterfaceName": {
+            "value": "gooner0808-nic"
+        },
+        "publicIPAddressName": {
+            "value": "gooner0808-pip"
+        },
+        "storageAccountName": {
+            "value": "gooner0808storage"
+        },
+        "virtualMachineName": {
+            "value": "gooner0808-vm"
+        },
+        "adminUsername": {
+            "value": "thara"
+        },
+        "adminPassword": {
+            "value": null
+        },
+        "diagnosticsStorageAccountName": {
+            "value": "gooner0808storage"
+        }
+    }
+}
