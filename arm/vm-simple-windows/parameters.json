@@ -2,6 +2,9 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "workspaceName": {
+            "value": "gooner0808-la"
+        },
         "virtualNetworkName": {
             "value": "gooner0808-vnet"
         },
@@ -35,11 +38,11 @@
         "adminUsername": {
             "value": "thara"
         },
-        "adminPassword": {
-            "value": null
-        },
         "diagnosticsStorageAccountName": {
             "value": "gooner0808storage"
+        },
+        "settingName": {
+            "value": "vnet-diag"
         }
     }
 }
