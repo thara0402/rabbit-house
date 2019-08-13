@@ -1,0 +1,103 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachineName": {
+            "type": "string"
+        },
+        "workspaceName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "actionGroupName": {
+            "type": "string"
+        },
+        "actionGroupShortName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "action01":{
+            "name": "action-thara",
+            "emailAddress": "thara@archway.co.jp"
+        },
+        "alertRule01":{
+            "name": "[concat(parameters('virtualMachineName'), 'のアラートルール名です')]",
+            "description": "[concat(parameters('virtualMachineName'), 'のアラートの説明です')]",
+            "query": "[format('Perf| where Computer contains \"{0}\"| where ObjectName == \"Processor\"| where CounterName == \"% Processor Time\"| where CounterValue >= 90', parameters('virtualMachineName'))]",
+            "emailSubject": "[concat(parameters('virtualMachineName'), 'のメールの件名です')]",
+            "severity": 1
+
+        }
+    },
+    "resources": [
+        {
+            "type": "microsoft.operationalinsights/workspaces",
+            "apiVersion": "2015-11-01-preview",
+            "name": "[parameters('workspaceName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "sku": {
+                    "name": "pergb2018"
+                },
+                "retentionInDays": 30
+            }
+        },
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2019-03-01",
+            "name": "[parameters('actionGroupName')]",
+            "location": "Global",
+            "properties": {
+                "groupShortName": "[parameters('actionGroupShortName')]",
+                "enabled": true,
+                "emailReceivers": [
+                    {
+                        "name": "[variables('action01').name]",
+                        "emailAddress": "[variables('action01').emailAddress]",
+                        "useCommonAlertSchema": false
+                    }
+                ]
+            }
+        },
+        {
+            "type": "microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2018-04-16",
+            "name": "[variables('alertRule01').name]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actionGroups', parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "description": "[variables('alertRule01').description]",
+                "enabled": "true",
+                "source": {
+                    "query": "[variables('alertRule01').query]",
+                    "dataSourceId": "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+                    "queryType": "ResultCount"
+                },
+                "schedule": {
+                    "frequencyInMinutes": 5,
+                    "timeWindowInMinutes": 5
+                },
+                "action": {
+                    "severity": "[variables('alertRule01').severity]",
+                    "trigger":{
+                        "thresholdOperator":"GreaterThan",
+                        "threshold": 1
+                    },
+                    "aznsAction":{
+                        "actionGroup":[
+                            "[resourceId('microsoft.insights/actionGroups', parameters('actionGroupName'))]"
+                        ],
+                        "emailSubject": "[variables('alertRule01').emailSubject]"
+                    },
+                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+                }
+            }
+        }
+    ]
+}
