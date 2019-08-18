@@ -8,9 +8,6 @@
         "virtualNetworkName": {
             "value": "gooner0808-vnet"
         },
-        "location": {
-            "value": "japaneast"
-        },
         "addressPrefix": {
             "value": "192.167.0.0/16"
         },
@@ -29,14 +26,8 @@
         "publicIPAddressName": {
             "value": "gooner0808-pip"
         },
-        "storageAccountName": {
-            "value": "gooner0808storage"
-        },
         "virtualMachineName": {
             "value": "gooner0808-vm"
-        },
-        "adminUsername": {
-            "value": "thara"
         },
         "diagnosticsStorageAccountName": {
             "value": "gooner0808storage"

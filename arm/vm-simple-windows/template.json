@@ -8,9 +8,6 @@
         "virtualNetworkName": {
             "type": "string"
         },
-        "location": {
-            "type": "string"
-        },
         "addressPrefix": {
             "type": "string"
         },
@@ -29,17 +26,20 @@
         "publicIPAddressName": {
             "type": "string"
         },
-        "storageAccountName": {
-            "type": "string"
-        },
         "virtualMachineName": {
             "type": "string"
         },
         "adminUsername": {
-            "type": "string"
+            "type": "secureString",
+            "metadata": {
+                "description":"仮想マシンの管理者アカウントです。"
+            }
         },
         "adminPassword": {
-            "type": "secureString"
+            "type": "secureString",
+            "metadata": {
+                "description":"仮想マシンの管理者アカウントのパスワードです。"
+            }
         },
         "diagnosticsStorageAccountName": {
             "type": "string"
@@ -53,7 +53,7 @@
             "type": "microsoft.operationalinsights/workspaces",
             "apiVersion": "2015-11-01-preview",
             "name": "[parameters('workspaceName')]",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "sku": {
                     "name": "pergb2018"
@@ -65,7 +65,7 @@
             "apiVersion": "2019-04-01",
             "name": "[parameters('virtualNetworkName')]",
             "type": "Microsoft.Network/virtualNetworks",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
             ],
@@ -97,11 +97,11 @@
                     "dependsOn": [
                         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
                         "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
-                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                        "[resourceId('Microsoft.Storage/storageAccounts', parameters('diagnosticsStorageAccountName'))]"
                     ],
                     "properties":{
                         "name":"[parameters('settingName')]",
-                        "storageAccountId":"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+                        "storageAccountId":"[resourceId('Microsoft.Storage/storageAccounts', parameters('diagnosticsStorageAccountName'))]",
                         "workspaceId": "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
                         "logs":[
                             {
@@ -131,7 +131,7 @@
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules":[
                     {
@@ -159,7 +159,7 @@
             "name": "[parameters('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
@@ -186,7 +186,7 @@
             "apiVersion": "2019-02-01",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[parameters('publicIPAddressName')]",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Basic"
             },
@@ -197,10 +197,10 @@
             }
         },
         {
-            "name": "[parameters('storageAccountName')]",
+            "name": "[parameters('diagnosticsStorageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-04-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "accessTier": "Hot",
                 "supportsHttpsTrafficOnly": true
@@ -215,13 +215,13 @@
             "name": "[parameters('virtualMachineName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddressName'))]",
                 "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('diagnosticsStorageAccountName'))]"
             ],
             "properties": {
                 "hardwareProfile": {

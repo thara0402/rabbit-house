@@ -8,9 +8,6 @@
         "workspaceName": {
             "type": "string"
         },
-        "location": {
-            "type": "string"
-        },
         "actionGroupName": {
             "type": "string"
         },
@@ -37,7 +34,7 @@
             "type": "microsoft.operationalinsights/workspaces",
             "apiVersion": "2015-11-01-preview",
             "name": "[parameters('workspaceName')]",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "sku": {
                     "name": "pergb2018"
@@ -66,7 +63,7 @@
             "type": "microsoft.insights/scheduledqueryrules",
             "apiVersion": "2018-04-16",
             "name": "[variables('alertRule01').name]",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
                 "[resourceId('microsoft.insights/actionGroups', parameters('actionGroupName'))]"
