@@ -2,38 +2,34 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "virtualMachineName": {
-            "type": "string"
-        },
-        "workspaceName": {
-            "type": "string"
-        },
-        "actionGroupName": {
-            "type": "string"
-        },
-        "actionGroupShortName": {
+        "resourceNamePrefix": {
             "type": "string"
         }
     },
     "variables": {
+        "workspaceName":"[concat(parameters('resourceNamePrefix'), '-la')]",
+        "virtualMachineName":"[concat(parameters('resourceNamePrefix'), '-vm')]",
+        "actionGroupName":"[concat(parameters('resourceNamePrefix'), '-ag')]",
+        "actionGroupShortName":"ag01",
+
         "action01":{
             "name": "action-thara",
             "emailAddress": "thara@archway.co.jp"
         },
         "alertRule01":{
-            "name": "[concat(parameters('virtualMachineName'), 'のアラートルール名です')]",
-            "description": "[concat(parameters('virtualMachineName'), 'のアラートの説明です')]",
-            "query": "[format('Perf| where Computer contains \"{0}\"| where ObjectName == \"Processor\"| where CounterName == \"% Processor Time\"| where CounterValue >= 90', parameters('virtualMachineName'))]",
-            "emailSubject": "[concat(parameters('virtualMachineName'), 'のメールの件名です')]",
+            "name": "[concat(variables('virtualMachineName'), 'のアラートルール名です')]",
+            "description": "[concat(variables('virtualMachineName'), 'のアラートの説明です')]",
+            "query": "[format('Perf| where Computer contains \"{0}\"| where ObjectName == \"Processor\"| where CounterName == \"% Processor Time\"| where CounterValue >= 90', variables('virtualMachineName'))]",
+            "emailSubject": "[concat(variables('virtualMachineName'), 'のメールの件名です')]",
             "severity": 1
 
         }
     },
     "resources": [
         {
-            "type": "microsoft.operationalinsights/workspaces",
+            "type": "Microsoft.operationalinsights/workspaces",
             "apiVersion": "2015-11-01-preview",
-            "name": "[parameters('workspaceName')]",
+            "name": "[variables('workspaceName')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "sku": {
@@ -43,12 +39,12 @@
             }
         },
         {
-            "type": "microsoft.insights/actionGroups",
+            "type": "Microsoft.insights/actionGroups",
             "apiVersion": "2019-03-01",
-            "name": "[parameters('actionGroupName')]",
+            "name": "[variables('actionGroupName')]",
             "location": "Global",
             "properties": {
-                "groupShortName": "[parameters('actionGroupShortName')]",
+                "groupShortName": "[variables('actionGroupShortName')]",
                 "enabled": true,
                 "emailReceivers": [
                     {
@@ -60,20 +56,20 @@
             }
         },
         {
-            "type": "microsoft.insights/scheduledqueryrules",
+            "type": "Microsoft.insights/scheduledqueryrules",
             "apiVersion": "2018-04-16",
             "name": "[variables('alertRule01').name]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actionGroups', parameters('actionGroupName'))]"
+                "[resourceId(resourceGroup().name, 'Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
+                "[resourceId(resourceGroup().name, 'Microsoft.insights/actionGroups', variables('actionGroupName'))]"
             ],
             "properties": {
                 "description": "[variables('alertRule01').description]",
                 "enabled": "true",
                 "source": {
                     "query": "[variables('alertRule01').query]",
-                    "dataSourceId": "[resourceId('microsoft.operationalinsights/workspaces', parameters('workspaceName'))]",
+                    "dataSourceId": "[resourceId('Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
                     "queryType": "ResultCount"
                 },
                 "schedule": {
@@ -88,7 +84,7 @@
                     },
                     "aznsAction":{
                         "actionGroup":[
-                            "[resourceId('microsoft.insights/actionGroups', parameters('actionGroupName'))]"
+                            "[resourceId('Microsoft.insights/actionGroups', variables('actionGroupName'))]"
                         ],
                         "emailSubject": "[variables('alertRule01').emailSubject]"
                     },
