@@ -37,7 +37,7 @@
     },
     "resources": [
         {
-            "type": "microsoft.operationalinsights/workspaces",
+            "type": "Microsoft.operationalinsights/workspaces",
             "apiVersion": "2015-11-01-preview",
             "name": "[variables('workspaceName')]",
             "location": "[resourceGroup().location]",
@@ -54,7 +54,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
             ],
             "properties": {
                 "addressSpace": {
@@ -82,14 +82,14 @@
                     "name": "[concat('Microsoft.Insights/', variables('vnetDiagnosticsSettingName'))]",
                     "apiVersion": "2017-05-01-preview",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-                        "[resourceId('microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
-                        "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
+                        "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+                        "[resourceId(resourceGroup().name, 'Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
+                        "[resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
                     ],
                     "properties":{
                         "name":"[variables('vnetDiagnosticsSettingName')]",
                         "storageAccountId":"[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]",
-                        "workspaceId": "[resourceId('microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
+                        "workspaceId": "[resourceId('Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
                         "logs":[
                             {
                                 "category":"VMProtectionAlerts",
@@ -148,8 +148,8 @@
             "apiVersion": "2018-10-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -204,11 +204,11 @@
             "apiVersion": "2018-10-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
-                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
+                "[resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -252,5 +252,11 @@
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "publicIPAddress":{
+            "value": "[reference(variables('publicIPAddressName')).ipAddress]",
+            "type": "string"
+        }
+    }
 }
