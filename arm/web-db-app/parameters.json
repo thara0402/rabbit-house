@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceNamePrefix": {
+            "value": "gooner0809"
+        },
+        "addressPrefix": {
+            "value": "192.167.0.0/16"
+        },
+        "subnetAddressPrefix": {
+            "value": "192.167.0.0/24"
+        },
+        "webSubnetAddressPrefix": {
+            "value": "192.167.1.0/24"
+        },
+        "appgwSubnetAddressPrefix": {
+            "value": "192.167.2.0/24"
+        }
+    }
+}

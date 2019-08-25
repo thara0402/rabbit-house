@@ -1,0 +1,160 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceNamePrefix": {
+            "type": "string"
+        },
+        "addressPrefix": {
+            "type": "string"
+        },
+        "subnetAddressPrefix": {
+            "type": "string"
+        },
+       "webSubnetAddressPrefix": {
+            "type": "string"
+        },
+        "appgwSubnetAddressPrefix": {
+            "type": "string"
+        },
+        "sqlAdminUsername": {
+            "type": "securestring",
+            "metadata": {
+                "description":"SQL Databaseの管理者アカウントです。"
+            }
+        },
+        "sqlAdminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description":"SQL Databaseの管理者アカウントのパスワードです。"
+            }
+        }
+
+    },
+    "variables": {
+        "virtualNetworkName":"[concat(parameters('resourceNamePrefix'), '-vnet')]",
+        "subnetName":"default",
+        "webSubnetName":"web",
+        "appgwSubnetName":"appgw",
+        "networkSecurityGroupName":"[concat(variables('subnetName'), '-nsg')]",
+        "webNetworkSecurityGroupName":"[concat(variables('webSubnetName'), '-nsg')]",
+        "appgwNetworkSecurityGroupName":"[concat(variables('appgwSubnetName'), '-nsg')]",
+        "sqlserverName":"[concat(parameters('resourceNamePrefix'), '')]",
+        "databaseName":"pubs"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Sql/servers",
+            "name": "[variables('sqlserverName')]",
+            "apiVersion": "2014-04-01-preview",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "administratorLogin": "[parameters('sqlAdminUsername')]",
+                "administratorLoginPassword": "[parameters('sqlAdminPassword')]",
+                "version": "12.0"
+            },
+            "resources": [
+                {
+                    "type": "databases",
+                    "name": "[variables('databaseName')]",
+                    "apiVersion": "2014-04-01-preview",
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "edition": "Basic",
+                        "collation":"SQL_Latin1_General_CP1_CI_AS",
+                        "maxSizeBytes": "2147483648"
+                    },
+                    "dependsOn": [
+                        "[resourceId(resourceGroup().name, 'Microsoft.Sql/servers', variables('sqlserverName'))]"
+                    ]
+                },
+                {
+                    "type": "firewallrules",
+                    "name": "AllowAllWindowsAzureIps",
+                    "apiVersion": "2014-04-01-preview",
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "endIpAddress": "0.0.0.0",
+                        "startIpAddress": "0.0.0.0"
+                    },
+                    "dependsOn": [
+                        "[resourceId(resourceGroup().name, 'Microsoft.Sql/servers', variables('sqlserverName'))]"
+                    ]
+                }
+            ]
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('webNetworkSecurityGroupName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules":[
+                ]
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('appgwNetworkSecurityGroupName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules":[
+                ]
+            }
+        },
+        {
+            "apiVersion": "2019-04-01",
+            "name": "[variables('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('webNetworkSecurityGroupName'))]",
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('appgwNetworkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetAddressPrefix')]",
+                            "addressPrefixes": [],
+                            "networkSecurityGroup":{
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('webSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('webSubnetAddressPrefix')]",
+                            "addressPrefixes": [],
+                            "networkSecurityGroup":{
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('webNetworkSecurityGroupName'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('appgwSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('appgwSubnetAddressPrefix')]",
+                            "addressPrefixes": [],
+                            "networkSecurityGroup":{
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appgwNetworkSecurityGroupName'))]"
+                            }
+                        }
+                    }
+                ],
+                "enableDdosProtection": false
+            }
+        }
+
+    ],
+    "outputs": {
+    }
+}
