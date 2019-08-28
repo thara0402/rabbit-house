@@ -4,6 +4,24 @@
     "parameters": {
         "resourceNamePrefix": {
             "value": "gooner0809"
+        },
+        "alertRules":{
+            "value": [
+                {
+                    "name" : "{0}のアラートルール名1です",
+                    "description": "{0}のアラートの説明です",
+                    "query": "Perf| where Computer contains \"{0}\"| where ObjectName == \"Processor\"| where CounterName == \"% Processor Time\"| where CounterValue >= 90",
+                    "emailSubject": "{0}のメールの件名です",
+                    "severity": 1
+                },
+                {
+                    "name" : "{0}のアラートルール名2です",
+                    "description": "{0}のアラートの説明です",
+                    "query": "Perf| where Computer contains \"{0}\"| where ObjectName == \"Processor\"| where CounterName == \"% Processor Time\"| where CounterValue >= 70",
+                    "emailSubject": "{0}のメールの件名です",
+                    "severity": 1
+                }
+            ]
         }
     }
 }
