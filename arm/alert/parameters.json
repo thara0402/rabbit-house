@@ -5,6 +5,18 @@
         "resourceNamePrefix": {
             "value": "gooner0809"
         },
+        "alertActions" :{
+            "value": [
+                {
+                    "name" : "action-thara",
+                    "emailAddress" : "thara@archway.co.jp"
+                },
+                {
+                    "name" : "action-thara2",
+                    "emailAddress" : "thara2@archway.co.jp"
+                }
+            ]
+        },
         "alertRules":{
             "value": [
                 {

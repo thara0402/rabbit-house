@@ -5,6 +5,9 @@
         "resourceNamePrefix": {
             "type": "string"
         },
+        "alertActions": {
+            "type": "array"
+        },
         "alertRules": {
             "type": "array"
         }
@@ -22,18 +25,6 @@
     },
     "resources": [
         {
-            "type": "Microsoft.operationalinsights/workspaces",
-            "apiVersion": "2015-11-01-preview",
-            "name": "[variables('workspaceName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "sku": {
-                    "name": "pergb2018"
-                },
-                "retentionInDays": 30
-            }
-        },
-        {
             "type": "Microsoft.insights/actionGroups",
             "apiVersion": "2019-03-01",
             "name": "[variables('actionGroupName')]",
@@ -41,11 +32,15 @@
             "properties": {
                 "groupShortName": "[variables('actionGroupShortName')]",
                 "enabled": true,
-                "emailReceivers": [
+                "copy" :[
                     {
-                        "name": "[variables('action01').name]",
-                        "emailAddress": "[variables('action01').emailAddress]",
-                        "useCommonAlertSchema": false
+                        "name" : "emailReceivers",
+                        "count" : "[length(parameters('alertActions'))]",
+                        "input" :{
+                            "name": "[parameters('alertActions')[copyIndex('emailReceivers')].name]",
+                            "emailAddress": "[parameters('alertActions')[copyIndex('emailReceivers')].emailAddress]",
+                            "useCommonAlertSchema": false
+                        }
                     }
                 ]
             }
@@ -56,7 +51,6 @@
             "name": "[format(parameters('alertRules')[copyIndex()].name, variables('virtualMachineName'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId(resourceGroup().name, 'Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
                 "[resourceId(resourceGroup().name, 'Microsoft.insights/actionGroups', variables('actionGroupName'))]"
             ],
             "properties": {
