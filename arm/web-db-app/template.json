@@ -50,29 +50,56 @@
             "properties": {
                 "name": "[variables('webAppName')]",
                 "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(concat('Microsoft.Insights/components/', variables('appInsightsName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "ApplicationInsightsAgent_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name": "XDT_MicrosoftApplicationInsights_Mode",
+                            "value": "default"
+                        },
+                        {
+                            "name": "DiagnosticServices_EXTENSION_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "APPINSIGHTS_PROFILERFEATURE_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "APPINSIGHTS_SNAPSHOTFEATURE_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "InstrumentationEngine_EXTENSION_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "SnapshotDebugger_EXTENSION_VERSION",
+                            "value": "disabled"
+                        },
+                        {
+                            "name": "XDT_MicrosoftApplicationInsights_BaseExtensions",
+                            "value": "disabled"
+                        }
+                    ],
                     "metadata": [
                         {
                             "name": "CURRENT_STACK",
                             "value": "dotnet"
                         }
                     ],
-                    "netFrameworkVersion": "v4.0"
+                    "netFrameworkVersion": "v4.0",
+                    "alwaysOn": true
                 },
-                "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-            },
-            "resources": [
-                {
-                    "apiVersion": "2018-02-01",
-                    "name": "appsettings",
-                    "type": "config",
-                    "dependsOn": [
-                        "[resourceId(resourceGroup().name, 'Microsoft.Web/Sites', variables('webAppName'))]"
-                    ],
-                    "properties": {
-                        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(concat('Microsoft.Insights/components/', variables('appInsightsName'))).InstrumentationKey]"
-                    }
-                }
-            ]
+                "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "clientAffinityEnabled": true
+            }
         },
         {
             "apiVersion": "2018-02-01",
