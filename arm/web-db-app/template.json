@@ -5,6 +5,9 @@
         "resourceNamePrefix": {
             "type": "string"
         },
+        "beSubnetAddressPrefix": {
+            "type": "string"
+        },
        "webSubnetAddressPrefix": {
             "type": "string"
         },
@@ -27,8 +30,10 @@
     },
     "variables": {
         "virtualNetworkName":"[concat(parameters('resourceNamePrefix'), '-vnet')]",
+        "beSubnetName":"default",
         "webSubnetName":"web",
         "appgwSubnetName":"appgw",
+        "beNetworkSecurityGroupName":"[concat(variables('beSubnetName'), '-nsg')]",
         "webNetworkSecurityGroupName":"[concat(variables('webSubnetName'), '-nsg')]",
         "appgwNetworkSecurityGroupName":"[concat(variables('appgwSubnetName'), '-nsg')]",
         "sqlserverName":"[concat(parameters('resourceNamePrefix'), '')]",
@@ -38,7 +43,8 @@
         "webAppName":"[concat(parameters('resourceNamePrefix'), '')]",
         "publicIPAddressName":"[concat(parameters('resourceNamePrefix'), '-appgw-pip')]",
         "appGwName":"[concat(parameters('resourceNamePrefix'), '')]",
-        "customProbeName":"custom-probe01"
+        "customProbeName":"custom-probe01",
+        "vnetIntegName":"vnetInteg01"
     },
     "resources": [
         {
@@ -47,6 +53,7 @@
             "apiVersion": "2019-02-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('appgwSubnetName'))]",
                 "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
             ],
             "properties": {
@@ -59,7 +66,7 @@
                         "name": "appGatewayIpConfig",
                         "properties": {
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('appgwSubnetName'))]"
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('appgwSubnetName'))]"
                             }
                         }
                     }
@@ -105,7 +112,7 @@
                             "requestTimeout": 20,
                             "path": "/",
                             "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', variables('appGwName')), '/probes/', variables('customProbeName'))]"
+                                "id": "[concat(resourceId(resourceGroup().name, 'Microsoft.Network/applicationGateways', variables('appGwName')), '/probes/', variables('customProbeName'))]"
                             }
                         }
                     }
@@ -316,6 +323,18 @@
             ]
         },
         {
+            "type": "Microsoft.Sql/servers/virtualNetworkRules",
+            "apiVersion": "2015-05-01-preview",
+            "name": "[concat(variables('sqlserverName'), '/newVnetRule1')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+            ],
+            "properties": {
+                "virtualNetworkSubnetId": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('beSubnetName'))]",
+                "ignoreMissingVnetServiceEndpoint": false
+            }
+        },
+        {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "[variables('webNetworkSecurityGroupName')]",
@@ -388,6 +407,28 @@
         },
         {
             "apiVersion": "2019-04-01",
+            "name": "[concat(variables('virtualNetworkName'), '/', variables('beSubnetName'))]",
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "addressPrefix": "[parameters('beSubnetAddressPrefix')]",
+                "networkSecurityGroup":{
+                    "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('beNetworkSecurityGroupName'))]"
+                },
+                "serviceEndpoints": [
+                    {
+                        "service": "Microsoft.Sql",
+                        "locations": [
+                            "[resourceGroup().location]"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2019-04-01",
             "name": "[concat(variables('virtualNetworkName'), '/', variables('webSubnetName'))]",
             "type": "Microsoft.Network/virtualNetworks/subnets",
             "location": "[resourceGroup().location]",
@@ -397,7 +438,7 @@
             "properties": {
                 "addressPrefix": "[parameters('webSubnetAddressPrefix')]",
                 "networkSecurityGroup":{
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('webNetworkSecurityGroupName'))]"
+                    "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('webNetworkSecurityGroupName'))]"
                 }
             }
         },
@@ -412,8 +453,17 @@
             "properties": {
                 "addressPrefix": "[parameters('appgwSubnetAddressPrefix')]",
                 "networkSecurityGroup":{
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('appgwNetworkSecurityGroupName'))]"
-                }
+                    "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('appgwNetworkSecurityGroupName'))]"
+                },
+                "serviceEndpoints": [
+                    {
+                        "provisioningState": "Succeeded",
+                        "service": "Microsoft.Web",
+                        "locations": [
+                            "*"
+                        ]
+                    }
+                ]
             }
         }
     ],

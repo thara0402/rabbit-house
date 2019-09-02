@@ -5,6 +5,9 @@
         "resourceNamePrefix": {
             "value": "gooner0809"
         },
+        "beSubnetAddressPrefix": {
+            "value": "192.167.0.0/24"
+        },
         "webSubnetAddressPrefix": {
             "value": "192.167.1.0/24"
         },
