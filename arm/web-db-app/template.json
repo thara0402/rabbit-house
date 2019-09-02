@@ -35,9 +35,157 @@
         "databaseName":"pubs",
         "appInsightsName":"[concat(parameters('resourceNamePrefix'), '-ai')]",
         "hostingPlanName":"[concat(parameters('resourceNamePrefix'), '')]",
-        "webAppName":"[concat(parameters('resourceNamePrefix'), '')]"
+        "webAppName":"[concat(parameters('resourceNamePrefix'), '')]",
+        "publicIPAddressName":"[concat(parameters('resourceNamePrefix'), '-appgw-pip')]",
+        "appGwName":"[concat(parameters('resourceNamePrefix'), '')]",
+        "customProbeName":"custom-probe01"
     },
     "resources": [
+        {
+            "name": "[variables('appGwName')]",
+            "type": "Microsoft.Network/applicationGateways",
+            "apiVersion": "2019-02-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+            ],
+            "properties": {
+                "sku": {
+                    "name": "WAF_v2",
+                    "tier": "WAF_v2"
+                },
+                "gatewayIPConfigurations": [
+                    {
+                        "name": "appGatewayIpConfig",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('appgwSubnetName'))]"
+                            }
+                        }
+                    }
+                ],
+                "frontendIPConfigurations": [
+                    {
+                        "name": "appGwPublicFrontendIp",
+                        "properties": {
+                            "PublicIPAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "frontendPorts": [
+                    {
+                        "name": "port_80",
+                        "properties": {
+                            "Port": 80
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "backend01",
+                        "properties": {
+                            "backendAddresses": [
+                                {
+                                    "fqdn": "[concat(variables('webAppName'), '.azurewebsites.net')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "backendHttpSettingsCollection": [
+                    {
+                        "name": "httpsetting01",
+                        "properties": {
+                            "Port": 80,
+                            "Protocol": "Http",
+                            "cookieBasedAffinity": "Disabled",
+                            "pickHostNameFromBackendAddress": true,
+                            "requestTimeout": 20,
+                            "path": "/",
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', variables('appGwName')), '/probes/', variables('customProbeName'))]"
+                            }
+                        }
+                    }
+                ],
+                "httpListeners": [
+                    {
+                        "name": "listener01",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId(resourceGroup().name, 'Microsoft.Network/applicationGateways', variables('appGwName')), '/frontendIPConfigurations/appGwPublicFrontendIp')]"
+                            },
+                            "frontendPort": {
+                                "id": "[concat(resourceId(resourceGroup().name, 'Microsoft.Network/applicationGateways', variables('appGwName')), '/frontendPorts/port_80')]"
+                            },
+                            "protocol": "Http",
+                            "sslCertificate": null
+                        }
+                    }
+                ],
+                "requestRoutingRules": [
+                    {
+                        "Name": "rule01",
+                        "properties": {
+                            "RuleType": "Basic",
+                            "httpListener": {
+                                "id": "[concat(resourceId(resourceGroup().name, 'Microsoft.Network/applicationGateways', variables('appGwName')), '/httpListeners/listener01')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId(resourceGroup().name, 'Microsoft.Network/applicationGateways', variables('appGwName')), '/backendAddressPools/backend01')]"
+                            },
+                            "backendHttpSettings": {
+                                "id": "[concat(resourceId(resourceGroup().name, 'Microsoft.Network/applicationGateways', variables('appGwName')), '/backendHttpSettingsCollection/httpsetting01')]"
+                            }
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "[variables('customProbeName')]",
+                        "properties": {
+                            "protocol": "Http",
+                            "path": "/",
+                            "interval": 30,
+                            "timeout": 30,
+                            "unhealthyThreshold": 3,
+                            "pickHostNameFromBackendHttpSettings": true,
+                            "minServers": 0,
+                            "match": {}
+                        },
+                        "type": "Microsoft.Network/applicationGateways/probes"
+                    }
+                ],
+                "enableHttp2": false,
+                "sslCertificates": [],
+                "autoscaleConfiguration": {
+                    "minCapacity": 2,
+                    "maxCapacity": 10
+                },
+                "webApplicationFirewallConfiguration": {
+                    "enabled": true,
+                    "firewallMode": "Detection",
+                    "ruleSetType": "OWASP",
+                    "ruleSetVersion": "3.0"
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-02-01",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4,
+                "publicIpAddressVersion": "IPv4"
+            }
+        },
         {
             "apiVersion": "2018-02-01",
             "name": "[variables('webAppName')]",
@@ -184,6 +332,57 @@
             "location": "[resourceGroup().location]",
             "properties": {
                 "securityRules":[
+                    {
+                        "name": "AllowAppGw",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "65200-65535",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "Port_80",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "Port_443",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 120,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
                 ]
             }
         },
