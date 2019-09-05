@@ -3,7 +3,8 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "resourceNamePrefix": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "aaa"
         },
         "beSubnetAddressPrefix": {
             "type": "string"
@@ -254,6 +255,25 @@
                 },
                 "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
                 "clientAffinityEnabled": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-02-01",
+            "name": "[concat(variables('webAppName'), '/web')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId(resourceGroup().name, 'Microsoft.Web/sites', variables('webAppName'))]"
+            ],
+            "properties":{
+                "ipSecurityRestrictions":[
+                    {
+                        "vnetSubnetResourceId":"[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('appgwSubnetName'))]",
+                        "action": "Allow",
+                        "priority": 100,
+                        "name": "accessRestriction01"
+                    }
+                ]
             }
         },
         {
