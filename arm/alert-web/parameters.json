@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceNamePrefix": {
+            "value": "gooner0809"
+        },
+        "alertRules":{
+            "value": [
+                {
+                    "name" : "{0}のアラートルール名1です",
+                    "description": "{0}のアラートの説明です",
+                    "query": "exceptions| where cloud_RoleName == \"{0}\"",
+                    "emailSubject": "{0}のメールの件名です",
+                    "severity": 1
+                }
+            ]
+        }
+    }
+}

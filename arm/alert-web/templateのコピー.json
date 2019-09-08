@@ -1,0 +1,90 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceNamePrefix": {
+            "type": "string"
+        },
+        "alertRules": {
+            "type": "array"
+        }
+    },
+    "variables": {
+        "appInsightsName":"[concat(parameters('resourceNamePrefix'), '-ai')]",
+        "webAppName":"[concat(parameters('resourceNamePrefix'), '')]",
+        "actionGroupName":"[concat(parameters('resourceNamePrefix'), '-ag')]",
+        "metricAlerts":{
+            "name": "metricAlertsName",
+            "description": "thara@archway.co.jp",
+            "severity": 1
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2018-04-16",
+            "name": "[format(parameters('alertRules')[copyIndex()].name, variables('webAppName'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "[format(parameters('alertRules')[copyIndex()].description, variables('webAppName'))]",
+                "enabled": "true",
+                "source": {
+                    "query": "[format(parameters('alertRules')[copyIndex()].query, variables('webAppName'))]",
+                    "dataSourceId": "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+                    "queryType": "ResultCount"
+                },
+                "schedule": {
+                    "frequencyInMinutes": 5,
+                    "timeWindowInMinutes": 5
+                },
+                "action": {
+                    "severity": "[parameters('alertRules')[copyIndex()].severity]",
+                    "trigger":{
+                        "thresholdOperator":"GreaterThan",
+                        "threshold": 1
+                    },
+                    "aznsAction":{
+                        "actionGroup":[
+                            "[resourceId('Microsoft.insights/actionGroups', variables('actionGroupName'))]"
+                        ],
+                        "emailSubject": "[format(parameters('alertRules')[copyIndex()].emailSubject, variables('webAppName'))]"
+                    },
+                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+                }
+            },
+            "copy": {
+                "name": "alertcopy",
+                "count": "[length(parameters('alertRules'))]"
+            }
+        },
+        {
+            "name": "[variables('metricAlerts').name]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "location": "global",
+            "properties": {
+              "description": "[variables('metricAlerts').description]",
+              "severity": "[variables('metricAlerts').severity]",
+              "enabled": true,
+              "scopes": [
+                "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]"
+              ],
+              "evaluationFrequency": "Pt15m",
+              "windowSize": "Pt15m",
+              "targetResourceType": "string",
+              "targetResourceRegion": "string",
+              "criteria": {
+                "additionalProperties": {},
+                "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+              },
+              "actions": [
+                {
+                  "actionGroupId": "[resourceId('Microsoft.insights/actionGroups', variables('actionGroupName'))]"
+                }
+              ]
+            }
+        }
+    ]
+}

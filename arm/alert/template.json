@@ -16,12 +16,7 @@
         "workspaceName":"[concat(parameters('resourceNamePrefix'), '-la')]",
         "virtualMachineName":"[concat(parameters('resourceNamePrefix'), '-vm')]",
         "actionGroupName":"[concat(parameters('resourceNamePrefix'), '-ag')]",
-        "actionGroupShortName":"ag01",
-
-        "action01":{
-            "name": "action-thara",
-            "emailAddress": "thara@archway.co.jp"
-        }
+        "actionGroupShortName":"ag01"
     },
     "resources": [
         {

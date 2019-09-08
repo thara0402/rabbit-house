@@ -45,7 +45,10 @@
         "publicIPAddressName":"[concat(parameters('resourceNamePrefix'), '-appgw-pip')]",
         "appGwName":"[concat(parameters('resourceNamePrefix'), '')]",
         "customProbeName":"custom-probe01",
-        "vnetIntegName":"vnetInteg01"
+        "sqlDiagnosticsSettingName":"sql-diagnostics",
+        "workspaceName":"[concat(parameters('resourceNamePrefix'), '-la')]",
+        "diagnosticsStorageAccountName":"[concat(parameters('resourceNamePrefix'), 'storage')]",
+        "appgwDiagnosticsSettingName":"appgw-diagnostics"
     },
     "resources": [
         {
@@ -178,7 +181,42 @@
                     "ruleSetType": "OWASP",
                     "ruleSetVersion": "3.0"
                 }
-            }
+            },
+            "resources": [
+                {
+                    "type": "providers/diagnosticSettings",
+                    "name": "[concat('Microsoft.Insights/', variables('appgwDiagnosticsSettingName'))]",
+                    "apiVersion": "2017-05-01-preview",
+                    "dependsOn": [
+                        "[resourceId(resourceGroup().name, 'Microsoft.Network/applicationGateways', variables('appGwName'))]"
+                    ],
+                    "properties":{
+                        "name":"[variables('appgwDiagnosticsSettingName')]",
+                        "storageAccountId":"[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]",
+                        "workspaceId": "[resourceId('Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
+                        "logs":[
+                            {
+                                "category":"ApplicationGatewayAccessLog",
+                                "enabled": true,
+                                "retentionPolicy":{
+                                    "days": 365,
+                                    "enabled": true
+                                }
+                            }
+                        ],
+                        "metrics":[
+                            {
+                                "category":"AllMetrics",
+                                "enabled": true,
+                                "retentionPolicy":{
+                                    "days": 365,
+                                    "enabled": true
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
         },
         {
             "apiVersion": "2019-02-01",
@@ -327,6 +365,41 @@
                     },
                     "dependsOn": [
                         "[resourceId(resourceGroup().name, 'Microsoft.Sql/servers', variables('sqlserverName'))]"
+                    ],
+                    "resources": [
+                        {
+                            "type": "providers/diagnosticSettings",
+                            "name": "[concat('Microsoft.Insights/', variables('sqlDiagnosticsSettingName'))]",
+                            "apiVersion": "2017-05-01-preview",
+                            "dependsOn": [
+                                "[resourceId(resourceGroup().name, 'Microsoft.Sql/servers/databases', variables('sqlserverName'), variables('databaseName'))]"
+                            ],
+                            "properties":{
+                                "name":"[variables('sqlDiagnosticsSettingName')]",
+                                "storageAccountId":"[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]",
+                                "workspaceId": "[resourceId('Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
+                                "logs":[
+                                    {
+                                        "category":"SQLInsights",
+                                        "enabled": true,
+                                        "retentionPolicy":{
+                                            "days": 365,
+                                            "enabled": true
+                                        }
+                                    }
+                                ],
+                                "metrics":[
+                                    {
+                                        "category":"Basic",
+                                        "enabled": true,
+                                        "retentionPolicy":{
+                                            "days": 365,
+                                            "enabled": true
+                                        }
+                                    }
+                                ]
+                            }
+                        }
                     ]
                 },
                 {
