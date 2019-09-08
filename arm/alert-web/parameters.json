@@ -15,6 +15,24 @@
                     "severity": 1
                 }
             ]
+        },
+        "metricAlertRules":{
+            "value": [
+                {
+                    "name": "CpuMetricAlert-{0}",
+                    "description": "CpuMetricAlert-{0}の説明です",
+                    "severity": 1,
+                    "metricName": "CpuPercentage",
+                    "threshold" : 90
+                },
+                {
+                    "name": "MemoryMetricAlert-{0}",
+                    "description": "MemoryMetricAlert-{0}の説明です",
+                    "severity": 1,
+                    "metricName": "MemoryPercentage",
+                    "threshold" : 90
+                }
+            ]
         }
     }
 }

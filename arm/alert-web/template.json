@@ -7,17 +7,16 @@
         },
         "alertRules": {
             "type": "array"
+        },
+        "metricAlertRules": {
+            "type": "array"
         }
     },
     "variables": {
         "appInsightsName":"[concat(parameters('resourceNamePrefix'), '-ai')]",
         "webAppName":"[concat(parameters('resourceNamePrefix'), '')]",
         "actionGroupName":"[concat(parameters('resourceNamePrefix'), '-ag')]",
-        "metricAlerts":{
-            "name": "metricAlertsName",
-            "description": "thara@archway.co.jp",
-            "severity": 1
-        }
+        "hostingPlanName":"[concat(parameters('resourceNamePrefix'), '')]"
     },
     "resources": [
         {
@@ -57,6 +56,44 @@
             "copy": {
                 "name": "alertcopy",
                 "count": "[length(parameters('alertRules'))]"
+            }
+        },
+        {
+            "name": "[format(parameters('metricAlertRules')[copyIndex()].name, variables('hostingPlanName'))]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "properties": {
+                "description": "[format(parameters('metricAlertRules')[copyIndex()].description, variables('hostingPlanName'))]",
+                "severity": "[parameters('metricAlertRules')[copyIndex()].severity]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId(resourceGroup().name, 'Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+                ],
+                "evaluationFrequency": "PT1M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name" : "1st criterion",
+                            "metricName": "[parameters('metricAlertRules')[copyIndex()].metricName]",
+                            "dimensions":[],
+                            "operator": "GreaterThan",
+                            "threshold" : "[parameters('metricAlertRules')[copyIndex()].threshold]",
+                            "timeAggregation": "Average"
+                        }
+                    ]
+                },
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('Microsoft.insights/actionGroups', variables('actionGroupName'))]"
+                    }
+                ]
+            },
+            "copy": {
+                "name": "metricAlertcopy",
+                "count": "[length(parameters('metricAlertRules'))]"
             }
         }
     ]
