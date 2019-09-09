@@ -21,3 +21,8 @@ $ az group deployment validate -g <ResourceGroup Name> --template-file template.
 ```shell-session
 $ az group delete -n <ResourceGroup Name>
 ```
+
+### Refelence
+
+https://docs.microsoft.com/en-us/azure/templates/
+https://docs.microsoft.com/en-us/rest/api/monitor/metricalerts/get
