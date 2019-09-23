@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceNamePrefix": {
+            "value": "gooner0809"
+        },
+        "alertRules":{
+            "value": [
+                {
+                    "name" : "【ActionRequired】 {0} DTU利用率Alert",
+                    "description": "{0}のDTU使用率が90%を超過しました。確認して下さい。 ",
+                    "query": "AzureMetrics | where ResourceProvider==\"MICROSOFT.SQL\"| where ResourceId contains \"/PREJPQA-SQS01/DATABASES/SOLUTIONQA\"| where MetricName==\"dtu_consumption_percent\" | summarize AggregatedValue = avg(Average) by bin(TimeGenerated, 15m)",
+                    "emailSubject": "【ActionRequired】 {0} DTU利用率Alert",
+                    "severity": 1
+                }
+            ]
+        }
+    }
+}

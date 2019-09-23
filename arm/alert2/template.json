@@ -1,0 +1,63 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceNamePrefix": {
+            "type": "string"
+        },
+        "alertRules": {
+            "type": "array"
+        }
+    },
+    "variables": {
+        "workspaceName":"[concat(parameters('resourceNamePrefix'), '-la')]",
+        "sqlserverName":"[concat(parameters('resourceNamePrefix'), '')]",
+        "actionGroupName":"[concat(parameters('resourceNamePrefix'), '-ag')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2018-04-16",
+            "name": "[format(parameters('alertRules')[copyIndex()].name, variables('sqlserverName'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "[format(parameters('alertRules')[copyIndex()].description, variables('sqlserverName'))]",
+                "enabled": "true",
+                "source": {
+                    "query": "[format(parameters('alertRules')[copyIndex()].query, variables('sqlserverName'))]",
+                    "dataSourceId": "[resourceId('Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
+                    "queryType": "ResultCount"
+                },
+                "schedule": {
+                    "frequencyInMinutes": 5,
+                    "timeWindowInMinutes": 5
+                },
+                "action": {
+                    "severity": "[parameters('alertRules')[copyIndex()].severity]",
+                    "trigger":{
+                        "thresholdOperator": "GreaterThan",
+                        "threshold": 80,
+                        "metricTrigger": {
+                          "thresholdOperator": "GreaterThan",
+                          "threshold": 1,
+                          "metricTriggerType": "Consecutive"
+                        }
+                    },
+                    "aznsAction":{
+                        "actionGroup":[
+                            "[resourceId('Microsoft.insights/actionGroups', variables('actionGroupName'))]"
+                        ],
+                        "emailSubject": "[format(parameters('alertRules')[copyIndex()].emailSubject, variables('sqlserverName'))]"
+                    },
+                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+                }
+            },
+            "copy": {
+                "name": "alertcopy",
+                "count": "[length(parameters('alertRules'))]"
+            }
+        }
+    ]
+}
