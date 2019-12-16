@@ -6,13 +6,13 @@
 ```shell-session
 $ git clone <repository url>
 $ cd <repository>
-$ git checkout -b <feature> master
+$ git checkout -b feature master
 ```
 #### ローカル開発が完了
 ```shell-session
 $ git add .
 $ git commit -m "add-feature."
-$ git push -u origin <feature>
+$ git push -u origin feature
 ```
 feature ブランチから、master ブランチに Pull Request を作成する
 
@@ -20,10 +20,10 @@ feature ブランチから、master ブランチに Pull Request を作成する
 ```shell-session
 $ git checkout master
 $ git pull origin master
-$ git checkout -b <feature-2> master
+$ git checkout -b feature-2 master
 $ git add .
 $ git commit -m "add-feature-2."
-$ git push -u origin <feature-2>
+$ git push -u origin feature-2
 ```
 feature-2 ブランチから、master ブランチに Pull Request を作成する
 
