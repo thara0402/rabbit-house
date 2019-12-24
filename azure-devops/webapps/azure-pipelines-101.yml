@@ -1,0 +1,59 @@
+trigger:
+- master
+
+variables:
+  imageName: windows-2019
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Build'
+      inputs:
+        command: 'build'
+        projects: '**/WebApplication.csproj'
+        arguments: '--configuration Release'
+    - task: DotNetCoreCLI@2
+      displayName: 'Test'
+      inputs:
+        command: 'test'
+        projects: '**/WebApplication.Tests.csproj'
+        arguments: '--configuration Release'
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish'
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        arguments: '--configuration Release --output $(System.DefaultWorkingDirectory)/publish'
+        zipAfterPublish: true
+    - publish: publish
+      displayName: 'Publish artifact'
+      artifact: webapp
+    
+- stage: Release
+  dependsOn:
+  - Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - deployment: Deploy_Commit_Stage
+    displayName: 'Release'
+    pool:
+      vmImage: $(imageName)
+    environment: Commit-Stage
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebApp@1
+            displayName: 'Deploy to Azure Web Apps'
+            inputs:
+              azureSubscription: 'AzureSponsorships'
+              appType: 'webAppLinux'
+              appName: 'gooner1217'
+              package: '$(Pipeline.Workspace)/**/*.zip'
+              deploymentMethod: runFromPackage
+

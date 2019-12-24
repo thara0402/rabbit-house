@@ -1,0 +1,35 @@
+trigger:
+- master
+
+variables:
+  imageName: 'windows-2019'
+  buildConfiguration: 'Release'
+  projects: '**/WebApplication.csproj'
+  testProjects: '**/WebApplication.Tests.csproj'
+  azureSubscription: 'AzureSponsorships'
+  webAppsName: 'gooner1217'
+  webAppsType: 'webAppLinux'
+  environment: 'Commit-Stage'
+
+stages:
+- stage: Build
+  jobs:
+  - template: pipelines/build-pipelines.yml
+    parameters:
+      imageName: $(imageName)
+      buildConfiguration: $(buildConfiguration)
+      projects: $(projects)
+      testProjects: $(testProjects)
+    
+- stage: Release
+  dependsOn:
+  - Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - template: pipelines/release-pipelines.yml
+    parameters:
+      imageName: $(imageName)
+      azureSubscription: $(azureSubscription)
+      webAppsName: $(webAppsName)
+      webAppsType: $(webAppsType)
+      environment: $(environment)
