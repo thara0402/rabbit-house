@@ -54,6 +54,9 @@ $ vue add buefy
 ### Add Element
 ```shell-session
 $ vue add element
+? How do you want to import Element? Fully import
+? Do you wish to overwrite Element's SCSS variables? Yes
+? Choose the locale you want to load ja
 ```
 
 ### Add axios
