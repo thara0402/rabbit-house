@@ -22,32 +22,23 @@
             "metadata": {
                 "description":"仮想マシンの管理者アカウントのパスワードです。"
             }
+        },
+        "numberOfInstances": {
+            "type": "int",
+            "minValue": 2,
+            "maxValue": 5
         }
     },
     "variables": {
-        "workspaceName":"[concat(parameters('resourceNamePrefix'), '-la')]",
         "virtualNetworkName":"[concat(parameters('resourceNamePrefix'), '-vnet')]",
         "networkInterfaceName":"[concat(parameters('resourceNamePrefix'), '-nic')]",
         "publicIPAddressName":"[concat(parameters('resourceNamePrefix'), '-pip')]",
         "virtualMachineName":"[concat(parameters('resourceNamePrefix'), '-vm')]",
         "diagnosticsStorageAccountName":"[concat(parameters('resourceNamePrefix'), 'storage')]",
         "subnetName":"default",
-        "networkSecurityGroupName":"[concat(variables('subnetName'), '-nsg')]",
-        "vnetDiagnosticsSettingName":"vnet-diagnostics"
+        "networkSecurityGroupName":"[concat(variables('subnetName'), '-nsg')]"
     },
     "resources": [
-        {
-            "type": "Microsoft.operationalinsights/workspaces",
-            "apiVersion": "2015-11-01-preview",
-            "name": "[variables('workspaceName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "sku": {
-                    "name": "pergb2018"
-                },
-                "retentionInDays": 30
-            }
-        },
         {
             "apiVersion": "2019-04-01",
             "name": "[variables('virtualNetworkName')]",
@@ -75,44 +66,7 @@
                     }
                 ],
                 "enableDdosProtection": false
-            },
-            "resources": [
-                {
-                    "type": "providers/diagnosticSettings",
-                    "name": "[concat('Microsoft.Insights/', variables('vnetDiagnosticsSettingName'))]",
-                    "apiVersion": "2017-05-01-preview",
-                    "dependsOn": [
-                        "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-                        "[resourceId(resourceGroup().name, 'Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
-                        "[resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
-                    ],
-                    "properties":{
-                        "name":"[variables('vnetDiagnosticsSettingName')]",
-                        "storageAccountId":"[resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]",
-                        "workspaceId": "[resourceId('Microsoft.operationalinsights/workspaces', variables('workspaceName'))]",
-                        "logs":[
-                            {
-                                "category":"VMProtectionAlerts",
-                                "enabled": true,
-                                "retentionPolicy":{
-                                    "days": 365,
-                                    "enabled": true
-                                }
-                            }
-                        ],
-                        "metrics":[
-                            {
-                                "category":"AllMetrics",
-                                "enabled": true,
-                                "retentionPolicy":{
-                                    "days": 365,
-                                    "enabled": true
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
+            }
         },
         {
             "apiVersion": "2015-06-15",
@@ -142,12 +96,12 @@
             }
         },
         {
-            "name": "[variables('networkInterfaceName')]",
+            "name": "[concat(variables('networkInterfaceName'), copyindex())]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
+                "publicIPAddressLoop",
                 "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
             ],
             "properties": {
@@ -158,7 +112,7 @@
                             "privateIpAddressVersion": "IPv4",
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress":{
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('publicIPAddressName'), copyindex()))]"
                             },
                             "subnet": {
                                 "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
@@ -166,12 +120,16 @@
                         }
                     }
                 ]
+            },
+            "copy": {
+                "name": "networkInterfaceLoop",
+                "count": "[parameters('numberOfInstances')]"
             }
         },
         {
             "apiVersion": "2019-02-01",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIPAddressName')]",
+            "name": "[concat(variables('publicIPAddressName'), copyindex())]",
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Basic"
@@ -180,6 +138,10 @@
                 "publicIPAllocationMethod": "Static",
                 "idleTimeoutInMinutes": 4,
                 "publicIpAddressVersion": "IPv4"
+            },
+            "copy": {
+                "name": "publicIPAddressLoop",
+                "count": "[parameters('numberOfInstances')]"
             }
         },
         {
@@ -198,15 +160,14 @@
             "kind": "StorageV2"
         },
         {
-            "name": "[variables('virtualMachineName')]",
+            "name": "[concat(variables('virtualMachineName'), copyindex())]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
                 "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-                "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
-                "[resourceId(resourceGroup().name, 'Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]",
+                "networkInterfaceLoop",
                 "[resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables('diagnosticsStorageAccountName'))]"
             ],
             "properties": {
@@ -230,12 +191,12 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceName'), copyindex()))]"
                         }
                     ]
                 },
                 "osProfile": {
-                    "computerName": "[variables('virtualMachineName')]",
+                    "computerName": "[concat(variables('virtualMachineName'), copyindex())]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
                     "windowsConfiguration": {
@@ -249,13 +210,13 @@
                         "storageUri": "[concat('https://', variables('diagnosticsStorageAccountName'), '.blob.core.windows.net/')]"
                     }
                 }
+            },
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfInstances')]"
             }
         }
     ],
     "outputs": {
-        "publicIPAddress":{
-            "value": "[reference(variables('publicIPAddressName')).ipAddress]",
-            "type": "string"
-        }
     }
 }

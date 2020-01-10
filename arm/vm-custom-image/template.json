@@ -22,6 +22,12 @@
             "metadata": {
                 "description":"仮想マシンの管理者アカウントのパスワードです。"
             }
+        },
+        "imageName": {
+            "type": "string"
+        },
+        "imageRsourceGroupName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -221,10 +227,7 @@
                         }
                     },
                     "imageReference": {
-                        "publisher": "MicrosoftWindowsServer",
-                        "offer": "WindowsServer",
-                        "sku": "2016-Datacenter",
-                        "version": "latest"
+                        "id": "[resourceId(parameters('imageRsourceGroupName'), 'Microsoft.Compute/images', parameters('imageName'))]"
                     }
                 },
                 "networkProfile": {

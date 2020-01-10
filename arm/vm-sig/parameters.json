@@ -10,6 +10,15 @@
         },
         "subnetAddressPrefix": {
             "value": "192.168.0.0/24"
+        },
+        "galleryName": {
+            "value": "sig"
+        },
+        "galleryImageDefinitionName": {
+            "value": "test01"
+        },
+        "galleryImageVersionName": {
+            "value": "1.0.0"
         }
     }
 }
