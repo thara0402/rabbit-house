@@ -22,6 +22,22 @@ $ az group deployment validate -g <ResourceGroup Name> --template-file template.
 $ az group delete -n <ResourceGroup Name>
 ```
 
+## Sample
+### Virtual Machines
+- [シンプルな Windows 仮想マシンを作成する](./vm-simple-windows/template.json)
+- [カスタムイメージから仮想マシンを作成する](./vm-custom-image/template.json)
+- [Shared Image Gallery から仮想マシンを作成する](./vm-sig/template.json)
+- [複数の仮想マシンを作成する](./vm-copy-index-loops/template.json)
+
+### Web Apps
+- [Application Gateway v2 + Web Apps + SQL Database を作成する](./web-db-app/template.json)
+
+### Alerts
+- [仮想マシンにアラートを設定する](./alert/template.json)
+- [Web Apps にアラートを設定する](./alert-web/template.json)
+- [SQL Database にアラートを設定する](./alert-sql/template.json)
+
+
 ## Refelence
 
 ### Define resources in Azure Resource Manager templates

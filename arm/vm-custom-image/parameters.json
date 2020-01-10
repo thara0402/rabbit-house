@@ -3,13 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "resourceNamePrefix": {
-            "value": "gooner0110"
+            "value": "gooner0109"
         },
         "addressPrefix": {
-            "value": "192.168.0.0/16"
+            "value": "192.167.0.0/16"
         },
         "subnetAddressPrefix": {
-            "value": "192.168.0.0/24"
+            "value": "192.167.0.0/24"
+        },
+        "imageName": {
+            "value": "test01"
+        },
+        "imageRsourceGroupName": {
+            "value": "vm-image"
         }
     }
 }
