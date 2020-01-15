@@ -27,7 +27,9 @@ $ az group delete -n <ResourceGroup Name>
 - [シンプルな Windows 仮想マシンを作成する](./vm-simple-windows/template.json)
 - [カスタムイメージから仮想マシンを作成する](./vm-custom-image/template.json)
 - [Shared Image Gallery から仮想マシンを作成する](./vm-sig/template.json)
-- [複数の仮想マシンを作成する](./vm-copy-index-loops/template.json)
+- [複数の仮想マシンを作成する](./vm-copy/template.json)
+- [カスタムイメージから複数の仮想マシンを作成する](./vm-copy-custom-image/template.json)
+- [Shared Image Gallery から複数の仮想マシンを作成する](./vm-copy-sig/template.json)
 
 ### Web Apps
 - [Application Gateway v2 + Web Apps + SQL Database を作成する](./web-db-app/template.json)
