@@ -2,15 +2,23 @@ trigger:
 - production
 
 variables:
-  imageName: 'windows-2019'
-  buildConfiguration: 'Release'
-  projects: '**/msp-test-fn.csproj'
-  testProjects: '**/msp-test-fn.Tests.csproj'
-  azureSubscription: 'AzureSponsorships'
-  functionAppsName: 'gooner0122'
-  functionAppsType: 'functionApp'
-  environment: 'Production-Stage'
-  functionAppsSlotName: 'staging'
+- group: variable-group-production
+- name: imageName
+  value: 'windows-2019'
+- name: buildConfiguration
+  value: 'Release'
+- name: projects
+  value: '**/msp-test-fn.csproj'
+- name: testProjects
+  value: '**/msp-test-fn.Tests.csproj'
+- name: azureSubscription
+  value: 'AzureSponsorships'
+- name: functionAppsType
+  value: 'functionApp'
+- name: environment
+  value: 'Production-Stage'
+- name: functionAppsSlotName
+  value: 'staging'
 
 stages:
 - stage: Build
