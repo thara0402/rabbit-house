@@ -11,6 +11,8 @@ variables:
   value: '**/WebApplication.csproj'
 - name: testProjects
   value: '**/WebApplication.Tests.csproj'
+- name: dotnetSdkVersion
+  value: '3.1.x'
 - name: azureSubscription
   value: 'AzureSponsorships'
 - name: webAppsType
@@ -27,6 +29,7 @@ stages:
       buildConfiguration: $(buildConfiguration)
       projects: $(projects)
       testProjects: $(testProjects)
+      dotnetSdkVersion: $(dotnetSdkVersion)
     
 - stage: Release
   dependsOn:

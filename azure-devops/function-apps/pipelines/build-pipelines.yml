@@ -3,12 +3,18 @@ parameters:
   buildConfiguration: ''
   projects: ''
   testProjects: ''
+  dotnetSdkVersion: ''
 
 jobs:
 - job: Build
   pool:
     vmImage: ${{parameters.imageName}}
   steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Install .NET Core SDK $(dotnetSdkVersion)'
+    inputs:
+      packageType: 'sdk'
+      version: $(dotnetSdkVersion)
   - task: DotNetCoreCLI@2
     displayName: 'Build'
     inputs:
