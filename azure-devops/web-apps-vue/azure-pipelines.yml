@@ -1,0 +1,36 @@
+trigger:
+- master
+
+variables:
+- group: variable-group-commit
+- name: imageName
+  value: 'ubuntu-latest'
+- name: nodeVersion
+  value: '10.x'
+- name: azureSubscription
+  value: 'AzureSponsorships'
+- name: webAppsType
+  value: 'webApp'
+- name: environment
+  value: 'Commit-Stage'
+
+stages:
+- stage: Build
+  jobs:
+  - template: pipelines/build-pipelines.yml
+    parameters:
+      imageName: $(imageName)
+      nodeVersion: $(nodeVersion)
+    
+- stage: Release
+  dependsOn:
+  - Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  jobs:
+  - template: pipelines/release-pipelines.yml
+    parameters:
+      imageName: $(imageName)
+      azureSubscription: $(azureSubscription)
+      webAppsName: $(webAppsName)
+      webAppsType: $(webAppsType)
+      environment: $(environment)
