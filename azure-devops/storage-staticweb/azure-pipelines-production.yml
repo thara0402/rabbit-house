@@ -1,0 +1,37 @@
+trigger:
+- production
+
+variables:
+- group: variable-group-production
+- name: imageName
+  value: 'ubuntu-latest'
+- name: nodeVersion
+  value: '10.x'
+- name: azureSubscription
+  value: 'AzureSponsorships'
+- name: environment
+  value: 'Production-Stage'
+
+stages:
+- stage: Build
+  jobs:
+  - template: pipelines/build-pipelines.yml
+    parameters:
+      imageName: $(imageName)
+      nodeVersion: $(nodeVersion)
+    
+- stage: Release
+  dependsOn:
+  - Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/production'))
+  jobs:
+  - template: pipelines/release-pipelines.yml
+    parameters:
+      imageName: $(imageName)
+      azureSubscription: $(azureSubscription)
+      storageAccountName: $(storageAccountName)
+      environment: $(environment)
+      cdnResourseGroupName: $(cdnResourseGroupName)
+      cdnEndpointName: $(cdnEndpointName)
+      cdnProfileName: $(cdnProfileName)
+      

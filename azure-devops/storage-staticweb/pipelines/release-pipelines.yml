@@ -1,0 +1,50 @@
+parameters:
+  imageName: ''
+  azureSubscription: ''
+  storageAccountName: ''
+  environment: ''
+  cdnResourseGroupName: ''
+  cdnEndpointName: ''
+  cdnProfileName: ''
+
+jobs:
+- deployment: Deploy_Static_Website_with_Azure_Storage
+  displayName: 'Release'
+  pool:
+    vmImage: ${{parameters.imageName}}
+  environment: ${{parameters.environment}}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - script: |
+            wget https://aka.ms/downloadazcopy-v10-linux
+            tar -xvf downloadazcopy-v10-linux
+            cp ./azcopy_linux_amd64_*/azcopy ./
+          displayName: 'Install AzCopy v10'
+
+        - task: ExtractFiles@1
+          inputs:
+            archiveFilePatterns: '$(Pipeline.Workspace)/**/*.zip'
+            destinationFolder: '$(Pipeline.Workspace)/deploy'
+            cleanDestinationFolder: true
+          displayName: 'Extracting site content'
+        
+        - task: AzureCLI@1
+          inputs:
+            azureSubscription: ${{parameters.azureSubscription}}
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              end=`date -d "5 minutes" '+%Y-%m-%dT%H:%M:%SZ'`
+              sas=`az storage container generate-sas -n '$web' --account-name $1 --https-only --permissions dlrw --expiry $end -otsv`
+              ./azcopy sync "$(Pipeline.Workspace)/deploy/" "https://$1.blob.core.windows.net/\$web?$sas" --recursive --delete-destination=true
+            arguments: ${{parameters.storageAccountName}}
+          displayName: 'Deploy to Static Website with Azure Storage'
+
+        - task: AzureCLI@1
+          inputs:
+            azureSubscription: ${{parameters.azureSubscription}}
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              az cdn endpoint purge -g ${{parameters.cdnResourseGroupName}} -n ${{parameters.cdnEndpointName}} --profile-name ${{parameters.cdnProfileName}} --content-paths '/*'
+          displayName: 'Purge content for a CDN endpoint'
