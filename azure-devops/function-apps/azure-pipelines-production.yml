@@ -46,3 +46,4 @@ stages:
       functionAppsType: $(functionAppsType)
       environment: $(environment)
       functionAppsSlotName: $(functionAppsSlotName)
+      keyVaultEndpoint: $(keyVaultEndpoint)
