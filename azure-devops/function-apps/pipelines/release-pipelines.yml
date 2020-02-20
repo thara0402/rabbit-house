@@ -5,6 +5,7 @@ parameters:
   functionAppsType: ''
   functionAppsSlotName: 'production'
   environment: ''
+  keyVaultEndpoint: ''
 
 jobs:
 - deployment: Deploy_Azure_Functions
@@ -25,4 +26,5 @@ jobs:
             slotName: ${{parameters.functionAppsSlotName}}
             package: '$(Pipeline.Workspace)/**/*.zip'
             deploymentMethod: runFromPackage
+            appSettings: -KeyVault:Endpoint ${{parameters.keyVaultEndpoint}}
 
