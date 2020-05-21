@@ -304,3 +304,13 @@ Total amount of available memory in a managed cluster
 Number of pods in Ready state
 Statuses for various node conditions
 Number of pods by phase
+
+
+NameSpace
+```shell-session
+$ kubectl get ns
+$ kubectl apply -f namespace.yaml
+$ kubectl apply -f deployment.yaml -n customer-a
+$ kubectl apply -f service.yaml -n customer-a
+```
+
