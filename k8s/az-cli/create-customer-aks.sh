@@ -11,7 +11,7 @@ DOCKER_USERNAME=$1
 DOCKER_PASSWORD=$2
 
 # リソース名の定義
-PREFIX=nvx
+PREFIX=gooner
 NAMESPACE=customer001
 RESOURCE_GROUP=${NAMESPACE}
 STORAGE_ACCOUNT_NAME=${PREFIX}${NAMESPACE}
@@ -21,7 +21,7 @@ SECRET_NAME=azure-secret
 kubectl create namespace ${NAMESPACE}
 
 # ACR に接続する Kubernetes secret の作成
-kubectl create secret docker-registry nvx-service-secret \
+kubectl create secret docker-registry gooner-service-secret \
 --docker-server=${DOCKER_SERVER} \
 --docker-username=${DOCKER_USERNAME} \
 --docker-password=${DOCKER_PASSWORD} \

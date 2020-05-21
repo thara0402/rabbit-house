@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # リソース名の定義
-PREFIX=nvx-appgw
+PREFIX=gooner-appgw
 LOCATION=eastus
 RESOURCE_GROUP=${PREFIX}
 VNET_NAME=${PREFIX}-vnet
