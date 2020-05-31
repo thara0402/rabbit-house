@@ -1,0 +1,57 @@
+trigger:
+- production
+
+variables:
+- group: variable-group-production
+- name: agentPoolName
+  value: 'Production'
+- name: buildConfiguration
+  value: 'Release'
+- name: projects
+  value: '**/bsw-mdpf.csproj'
+- name: testProjects
+  value: '**/bsw-mdpf.Tests.csproj'
+- name: azureSubscription
+  value: 'azure-production'
+- name: webAppsType
+  value: 'webApp'
+- name: environment
+  value: 'Production-Stage'
+- name: webAppsSlotName
+  value: 'staging'
+
+stages:
+- stage: Build
+  jobs:
+  - template: pipelines/build-pipelines.yml
+    parameters:
+      agentPoolName: $(agentPoolName)
+      buildConfiguration: $(buildConfiguration)
+      projects: $(projects)
+      testProjects: $(testProjects)
+- stage: Staging
+  dependsOn:
+  - Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/production'))
+  jobs:
+  - template: pipelines/release-pipelines.yml
+    parameters:
+      agentPoolName: $(agentPoolName)
+      azureSubscription: $(azureSubscription)
+      webAppsName: $(webAppsName)
+      webAppsType: $(webAppsType)
+      environment: $(environment)
+      webAppsSlotName: $(webAppsSlotName)
+- stage: Production
+  dependsOn:
+  - Staging
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/production'))
+  jobs:
+  - template: pipelines/swap-pipelines.yml
+    parameters:
+      agentPoolName: $(agentPoolName)
+      azureSubscription: $(azureSubscription)
+      webAppsName: $(webAppsName)
+      environment: $(environment)
+      webAppsSlotName: $(webAppsSlotName)
+      resourceGroupName: $(resourceGroupName)
