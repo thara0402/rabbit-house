@@ -5,7 +5,7 @@ parameters:
   webAppsType: ''
   webAppsSlotName: 'production'
   environment: ''
-  logLevel: 'Information'
+  connectionString: ''
 
 jobs:
 - deployment: Deploy_Azure_WebApps
@@ -26,5 +26,5 @@ jobs:
             slotName: ${{parameters.webAppsSlotName}}
             package: '$(Pipeline.Workspace)/**/*.zip'
             deploymentMethod: runFromPackage
-            appSettings: -Logging:LogLevel:Default ${{parameters.logLevel}}
+            appSettings: -ConnectionStrings:DefaultConnection ${{parameters.connectionString}}
 
