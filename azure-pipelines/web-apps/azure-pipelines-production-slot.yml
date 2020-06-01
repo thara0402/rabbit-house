@@ -8,9 +8,9 @@ variables:
 - name: buildConfiguration
   value: 'Release'
 - name: projects
-  value: '**/bsw-mdpf.csproj'
+  value: '**/xxx.csproj'
 - name: testProjects
-  value: '**/bsw-mdpf.Tests.csproj'
+  value: '**/xxx.Tests.csproj'
 - name: azureSubscription
   value: 'azure-production'
 - name: webAppsType
@@ -42,6 +42,7 @@ stages:
       webAppsType: $(webAppsType)
       environment: $(environment)
       webAppsSlotName: $(webAppsSlotName)
+      connectionString: $(connectionString)
 - stage: Production
   dependsOn:
   - Staging

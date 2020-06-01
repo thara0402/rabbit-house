@@ -43,3 +43,4 @@ stages:
       webAppsName: $(webAppsName)
       webAppsType: $(webAppsType)
       environment: $(environment)
+      connectionString: $(connectionString)

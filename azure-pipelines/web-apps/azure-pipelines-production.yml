@@ -46,3 +46,4 @@ stages:
       webAppsType: $(webAppsType)
       environment: $(environment)
       webAppsSlotName: $(webAppsSlotName)
+      connectionString: $(connectionString)

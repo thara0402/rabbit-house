@@ -24,7 +24,7 @@ jobs:
             appType: ${{parameters.functionAppsType}}
             appName: ${{parameters.functionAppsName}}
             slotName: ${{parameters.functionAppsSlotName}}
-            package: '$(Pipeline.Workspace)/**/*.zip'
+            package: '$(Pipeline.Workspace)/functionApp/*.zip'
             deploymentMethod: runFromPackage
             appSettings: -KeyVault:Endpoint ${{parameters.keyVaultEndpoint}}
 
