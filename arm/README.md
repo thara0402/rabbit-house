@@ -54,3 +54,7 @@ https://docs.microsoft.com/en-us/rest/api/monitor/scheduledqueryrules/get
 
 ### Azure Resource Explorer
 https://resources.azure.com/
+
+## Recommend Extensions for Visual Studio Code
+### Bracket Pair Colorizer
+https://marketplace.visualstudio.com/items?itemName=CoenraadS.bracket-pair-colorizer
