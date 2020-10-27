@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerName": {
+            "value": "gooner1016"
+        },
+        "location": {
+            "value": "japaneast"
+        },
+        "imageType": {
+            "value": "Public"
+        },
+        "imageName": {
+            "value": "thara0402/cypress-docker:1.3.0"
+        },
+        "osType": {
+            "value": "Linux"
+        },
+        "numberCpuCores": {
+            "value": "1"
+        },
+        "memory": {
+            "value": "1.5"
+        },
+        "restartPolicy": {
+            "value": "Never"
+        },
+        "ipAddressType": {
+            "value": "Public"
+        },
+        "ports": {
+            "value": [
+                {
+                    "port": "80",
+                    "protocol": "TCP"
+                }
+            ]
+        },
+        "dnsNameLabel": {
+            "value": "gooner1016-3"
+        },
+        "workspaceId": {
+            "value": "<workspaceId>"
+        },
+        "workspaceKey": {
+            "value": "<workspaceKey>"
+        },
+        "environmentVariables": {
+            "value": [
+                {
+                    "name": "cypress_target_url",
+                    "value": "https://www.google.co.jp"
+                }
+            ]
+        }
+    }
+}
