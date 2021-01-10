@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <record kind = "amount">
+        <id>1</id>
+        <order_date>2021-01-01T00:00:00Z</order_date>
+        <customer_code>A0001</customer_code>
+        <product_code>KE-774</product_code>
+        <unit_price>500.00</unit_price>
+        <quantity>2</quantity>
+    </record>
+    <record kind = "tax">
+        <id>2</id>
+        <order_date>2021-01-01T00:00:00Z</order_date>
+        <customer_code>A0001</customer_code>
+        <product_code>KE-774</product_code>
+        <consumption_tax>100.00</consumption_tax>
+    </record>
+</dataset>

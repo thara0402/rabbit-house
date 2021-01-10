@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <record>
+        <id>1</id>
+        <order_date>2021-01-01T00:00:00Z</order_date>
+        <customer_code>A0001</customer_code>
+        <product_code>KE-774</product_code>
+        <unit_price>414.17</unit_price>
+        <quantity>2</quantity>
+    </record>
+    <record>
+        <id>2</id>
+        <order_date>2021-01-01T00:00:00Z</order_date>
+        <customer_code>A0002</customer_code>
+        <product_code>MF-050</product_code>
+        <unit_price>395.07</unit_price>
+        <quantity>3</quantity>
+    </record>
+    <record>
+        <id>3</id>
+        <order_date>2021-01-01T00:00:00Z</order_date>
+        <customer_code>A0003</customer_code>
+        <product_code>FC-936</product_code>
+        <unit_price>480.58</unit_price>
+        <quantity>3</quantity>
+    </record>
+</dataset>
