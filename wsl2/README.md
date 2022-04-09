@@ -58,8 +58,8 @@ $ cat /etc/os-release
 $ sudo apt update && sudo apt upgrade
 ```
 
-# Visual Studio Code
-## Install
+## Visual Studio Code
+### Install
 VS Code の拡張機能をインストール
 - Remote Development
 
@@ -71,13 +71,13 @@ Unpacking: 100%
 Unpacked 2341 files and folders to /home/thara/.vscode-server/bin/e18005f0f1b33c29e81d732535d8c0e47cafb0b5.
 ```
 
-# Docker Desktop
-## Prerequisites
+## Docker Desktop
+### Prerequisites
 Linux カーネル更新プログラム パッケージをインストール
 
 https://docs.microsoft.com/ja-jp/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
 
-## Install
+### Install
 https://docs.docker.com/desktop/windows/wsl/
 
 ```shell-session
